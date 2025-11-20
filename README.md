@@ -1,4 +1,45 @@
-## Laravel
+# News Aggregator API with Laravel
+
+## Project Overview
+
+This project is a backend system for aggregating and serving articles. It provides data aggregation, storage, and API endpoints for frontend consumption.
+
+---
+
+### 1. Data Aggregation and Storage
+
+Implement a backend system that:
+
+- Fetches articles from selected data sources (**choose at least 3** from the provided list)
+- Stores the articles locally in a database
+- Regularly updates data from live sources to keep it fresh
+
+**Requirements:**
+
+- Data must be persisted in a database (e.g., MySQL, PostgreSQL, SQLite)
+- Backend should handle updates and avoid duplicates
+- Fetching should be scheduled (e.g., via cron job, queue system, or scheduler)
+
+---
+
+### 2. API Endpoints
+
+Create RESTful API endpoints that allow the frontend to:
+
+- Retrieve articles based on:
+  - Search queries
+  - Filtering criteria: date, category, source
+  - User preferences: selected sources, categories, authors
+- Support pagination and sorting
+
+**Example Endpoints:**
+
+```http
+GET /api/articles?search=AI&category=Technology&source=TechCrunch
+GET /api/articles?author=John+Doe&date=2025-11-20
+```
+
+## Commands
 
 ```bash
 composer --version
