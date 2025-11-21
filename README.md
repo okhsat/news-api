@@ -71,6 +71,10 @@ php artisan make:controller SourceController --api
 php artisan make:controller CategoryController --api
 php artisan make:controller ArticleController --api
 php artisan make:controller SyncLogController --api
+php artisan make:controller AuthController
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate
 php artisan route:clear
 php artisan route:list
 mkdir -p app/Services/News
@@ -94,9 +98,6 @@ php artisan news:test
 sqlite3 database/database.sqlite
 sqlite> SELECT COUNT(*) FROM articles;
 sqlite> SELECT id, title, source_id FROM articles ORDER BY id DESC LIMIT 10;
-composer require laravel/sanctum
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
-php artisan migrate
 php artisan migrate:fresh
 php artisan test
 php artisan queue:work --daemon --sleep=3 --tries=3
