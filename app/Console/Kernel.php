@@ -41,7 +41,7 @@ class Kernel extends ConsoleKernel
                 FetchArticlesJob::dispatch($source, $service);
             }
 
-        })->everyMinute();
+        })->everyFifteenMinutes();
     }
 
     /**
