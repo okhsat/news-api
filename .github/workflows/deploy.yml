@@ -26,6 +26,8 @@ jobs:
             # Pull latest code
             # If repo not cloned yet, clone it
             if [ ! -d ".git" ]; then
+              mkdir -p ~/.ssh
+              ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
               git clone git@github.com:okhsat/news-api.git .
             else
               git fetch --all
@@ -33,32 +35,38 @@ jobs:
               git clean -fd
             fi
 
-            # Always overwrite .env from .env.example
-            cp .env.example .env
+            # Create .env from .env.example if it does not exist
+            if [ ! -f ".env" ]; then
+              cp .env.example .env
+            fi
+
+            # Escape special characters
+            ESCAPED_DB_PASSWORD=$(printf '%s' "${{ secrets.DB_PASSWORD }}" | sed -e 's/[\/&$!]/\\&/g')
+            ESCAPED_REDIS_PASSWORD=$(printf '%s' "${{ secrets.REDIS_PASSWORD }}" | sed -e 's/[\/&$!]/\\&/g')
 
             # Database
-            sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env
-            sed -i 's/DB_HOST=.*/DB_HOST=${{ vars.DB_HOST }}/' .env
-            sed -i 's/DB_PORT=.*/DB_PORT=${{ vars.DB_PORT }}/' .env
-            sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' .env
-            sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' .env
-            sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' .env
+            sed -i "s/^#\?DB_CONNECTION=.*/DB_CONNECTION=pgsql/" .env
+            sed -i "s/^#\?DB_HOST=.*/DB_HOST=${{ vars.DB_HOST }}/" .env
+            sed -i "s/^#\?DB_PORT=.*/DB_PORT=${{ vars.DB_PORT }}/" .env
+            sed -i "s/^#\?DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/" .env
+            sed -i "s/^#\?DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/" .env
+            sed -i "s/^#\?DB_PASSWORD=.*/DB_PASSWORD=$ESCAPED_DB_PASSWORD/" .env
 
             # Redis
-            sed -i 's/REDIS_HOST=.*/REDIS_HOST=${{ vars.REDIS_HOST }}/' .env
-            sed -i 's/REDIS_PORT=.*/REDIS_PORT=${{ vars.REDIS_PORT }}/' .env
-            sed -i 's/REDIS_PASSWORD=.*/REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}/' .env
+            sed -i "s/^#\?REDIS_HOST=.*/REDIS_HOST=${{ vars.REDIS_HOST }}/" .env
+            sed -i "s/^#\?REDIS_PORT=.*/REDIS_PORT=${{ vars.REDIS_PORT }}/" .env
+            sed -i "s/^#\?REDIS_PASSWORD=.*/REDIS_PASSWORD=$ESCAPED_REDIS_PASSWORD/" .env
 
             # Queue & Cache
-            sed -i 's/#QUEUE_CONNECTION=.*/QUEUE_CONNECTION=redis/' .env
-            sed -i 's/#CACHE_STORE=.*/CACHE_STORE=redis/' .env
+            sed -i "s/^#\?QUEUE_CONNECTION=.*/QUEUE_CONNECTION=redis/" .env
+            sed -i "s/^#\?CACHE_STORE=.*/CACHE_STORE=redis/" .env
 
-            # News API keys
-            sed -i 's|#NEWSAPI_KEY=.*|NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}|' .env
-            sed -i 's|#GUARDIAN_KEY=.*|GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}|' .env
-
+            # News APIs
+            sed -i "s|^#\?NEWSAPI_KEY=.*|NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}|" .env
+            sed -i "s|^#\?GUARDIAN_KEY=.*|GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}|" .env
+            
             # Use APP_KEY if exists, generate otherwise
-            if ! grep -q 'APP_KEY=' .env || [ -z "$(grep APP_KEY .env | cut -d '=' -f2)" ]; then
+            if ! grep -q 'APP_KEY=' .env || [ -z "$(grep APP_KEY .env | cut -d '=' -f2)" ] || ! php artisan key:validate >/dev/null 2>&1; then
               php artisan key:generate --force
             fi
 
