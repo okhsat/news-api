@@ -7,4 +7,7 @@
 >> DROP USER IF EXISTS news;
 >> CREATE USER news WITH ENCRYPTED PASSWORD 'xxxxx';
 >> GRANT ALL PRIVILEGES ON DATABASE news TO news;
+>> ALTER USER news WITH PASSWORD 'xxxxx';
 >> \q
+
+> psql -h 127.0.0.1 -U news -d news
