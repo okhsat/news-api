@@ -23,6 +23,7 @@ class BbcService implements NewsSourceInterface
                 'url'          => (string) $item->link,
                 'image_url'    => null,
                 'published_at' => (string) $item->pubDate,
+                'category'     => 'General',
             ];
             
         })->toArray();

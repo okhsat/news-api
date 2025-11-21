@@ -33,6 +33,7 @@ class NewsApiService implements NewsSourceInterface
                 'url'          => $item['url'] ?? null,
                 'image_url'    => $item['urlToImage'] ?? null,
                 'published_at' => $item['publishedAt'] ?? null,
+                'category'     => 'General', // default category,
             ];
             
         })->toArray();

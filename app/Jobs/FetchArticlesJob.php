@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\Source;
 use App\Models\SyncLog;
 use App\Services\News\NewsSourceInterface;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class FetchArticlesJob implements ShouldQueue
 {
@@ -28,11 +30,15 @@ class FetchArticlesJob implements ShouldQueue
     public function handle(): void
     {
         $articles = $this->service->fetchArticles();
-
         $fetchedCount = 0;
+        $categoriesMap = Category::pluck('id', 'slug')->toArray();
 
         foreach ($articles as $data) {
             $data['source_id'] = $this->source->id;
+            $slug = Str::slug($data['category'] ?? 'General');
+            $data['category_id'] = $categoriesMap[$slug] ?? $categoriesMap['general'];
+
+            unset($data['category']);
 
             // Prevent duplicates by URL
             $article = Article::updateOrCreate(

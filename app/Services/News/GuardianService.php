@@ -24,6 +24,9 @@ class GuardianService implements NewsSourceInterface
         if ( ! $response->successful() ) return [];
 
         return collect($response->json()['response']['results'])->map(function ($item) {
+            // Try to determine category from "sectionName" if available
+            $category = $item['sectionName'] ?? 'General';
+
             return [
                 'title'        => $item['webTitle'] ?? null,
                 'description'  => $item['fields']['trailText'] ?? null,
@@ -32,6 +35,7 @@ class GuardianService implements NewsSourceInterface
                 'url'          => $item['webUrl'] ?? null,
                 'image_url'    => $item['fields']['thumbnail'] ?? null,
                 'published_at' => $item['webPublicationDate'] ?? null,
+                'category'     => $category,
             ];
             
         })->toArray();

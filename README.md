@@ -86,8 +86,11 @@ php artisan make:job FetchArticlesJob
 mkdir -p app/Console && touch app/Console/Kernel.php
 sudo apt install sqlite3
 php artisan tinker
-touch database/seeders/SourcesTableSeeder.php
+php artisan make:seeder SourcesSeeder
+php artisan make:seeder CategorySeeder
 php artisan db:seed
+php artisan db:seed --class=SourcesSeeder --force
+php artisan db:seed --class=CategorySeeder --force
 php artisan make:command TestNewsSources
 php artisan news:test
 sqlite3 database/database.sqlite

@@ -78,7 +78,8 @@ jobs:
             php artisan migrate --force
 
             # Seed database (optional: only if fresh deploy or sources missing)
-            php artisan db:seed --class=SourcesTableSeeder --force
+            php artisan db:seed --class=SourcesSeeder --force
+            php artisan db:seed --class=CategorySeeder --force
 
             # Load news to test
             php artisan news:test
