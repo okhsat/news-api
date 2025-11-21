@@ -2,29 +2,29 @@
 
 ## Project Overview
 
-This project is a backend system for aggregating and serving articles. It provides data aggregation, storage, and API endpoints for frontend consumption.
+This project is a backend system for aggregating and serving news articles. It provides data aggregation, storage, and API endpoints for frontend consumption.
 
 ---
 
 ### 1. Data Aggregation and Storage
 
-Implement a backend system that:
+It implements a backend system that:
 
-- Fetches articles from selected data sources (**choose at least 3** from the provided list)
+- Fetches articles from selected news or data sources
 - Stores the articles locally in a database
 - Regularly updates data from live sources to keep it fresh
 
-**Requirements:**
+**Features:**
 
-- Data must be persisted in a database (e.g., MySQL, PostgreSQL, SQLite)
-- Backend should handle updates and avoid duplicates
-- Fetching should be scheduled (e.g., via cron job, queue system, or scheduler)
+- Data are persisted in a database (e.g., MySQL, PostgreSQL, SQLite)
+- Backend handles updates and avoid duplicates
+- Fetching is scheduled (queue system, scheduler, and cron job)
 
 ---
 
 ### 2. API Endpoints
 
-Create RESTful API endpoints that allow the frontend to:
+It provides RESTful API endpoints that allow the frontend to:
 
 - Retrieve articles based on:
   - Search queries
@@ -35,8 +35,8 @@ Create RESTful API endpoints that allow the frontend to:
 **Example Endpoints:**
 
 ```http
-GET /api/articles?search=AI&category=Technology&source=TechCrunch
-GET /api/articles?author=John+Doe&date=2025-11-20
+GET /api/articles?search=AI&category_id=4&source_id=3
+GET /api/articles?author=John+Doe&date_from=2025-11-20
 ```
 
 ## Commands
