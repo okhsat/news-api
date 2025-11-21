@@ -37,29 +37,29 @@ jobs:
 
             # Create .env
             cat > .env <<EOL
-APP_NAME=News Aggregator API
-APP_ENV=production
-APP_KEY=${{ secrets.APP_KEY }}
-APP_DEBUG=false
-APP_URL=https://api.news.turandevelop.com
+            APP_NAME=News Aggregator API
+            APP_ENV=production
+            APP_KEY=${{ secrets.APP_KEY }}
+            APP_DEBUG=false
+            APP_URL=https://api.news.turandevelop.com
 
-DB_CONNECTION=pgsql
-DB_HOST=${{ vars.DB_HOST }}
-DB_PORT=${{ vars.DB_PORT }}
-DB_DATABASE=${{ secrets.DB_DATABASE }}
-DB_USERNAME=${{ secrets.DB_USERNAME }}
-DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            DB_CONNECTION=pgsql
+            DB_HOST=${{ vars.DB_HOST }}
+            DB_PORT=${{ vars.DB_PORT }}
+            DB_DATABASE=${{ secrets.DB_DATABASE }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
 
-REDIS_HOST=${{ vars.REDIS_HOST }}
-REDIS_PORT=${{ vars.REDIS_PORT }}
-REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+            REDIS_HOST=${{ vars.REDIS_HOST }}
+            REDIS_PORT=${{ vars.REDIS_PORT }}
+            REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
 
-QUEUE_CONNECTION=redis
-CACHE_STORE=redis
+            QUEUE_CONNECTION=redis
+            CACHE_STORE=redis
 
-NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}
-GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}
-EOL
+            NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}
+            GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}
+            EOL
 
             # Install dependencies and optimize
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
