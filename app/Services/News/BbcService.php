@@ -11,7 +11,8 @@ class BbcService implements NewsSourceInterface
     public function fetchArticles(): array
     {
         $xml = @simplexml_load_file($this->rssUrl);
-        if (!$xml) return [];
+
+        if ( ! $xml ) return [];
 
         return collect($xml->channel->item)->map(function ($item) {
             return [
@@ -23,6 +24,7 @@ class BbcService implements NewsSourceInterface
                 'image_url'    => null,
                 'published_at' => (string) $item->pubDate,
             ];
+            
         })->toArray();
     }
 }

@@ -9,13 +9,19 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    protected $commands = [
+        \App\Console\Commands\TestNewsSources::class,
+    ];
+
     /**
      * Define the application's command schedule.
      */
     protected function schedule(Schedule $schedule): void
     {
         $schedule->call(function () {
-            $sources = Source::all();
+            $sources = Source::where('enabled', true)->get();
+
+            if ( $sources->isEmpty() ) return;
 
             foreach ($sources as $source) {
                 switch ($source->code) {
@@ -34,7 +40,8 @@ class Kernel extends ConsoleKernel
 
                 FetchArticlesJob::dispatch($source, $service);
             }
-        })->everyFifteenMinutes();
+
+        })->everyMinute();
     }
 
     /**

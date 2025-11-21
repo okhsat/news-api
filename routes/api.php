@@ -6,7 +6,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\SyncLogController;
 
-Route::apiResource('sources', SourceController::class);
-Route::apiResource('categories', CategoryController::class);
-Route::apiResource('articles', ArticleController::class);
-Route::apiResource('sync-logs', SyncLogController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('sources', SourceController::class);
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('articles', ArticleController::class);
+    Route::apiResource('sync-logs', SyncLogController::class);
+});

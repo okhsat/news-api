@@ -21,7 +21,7 @@ class GuardianService implements NewsSourceInterface
             'page-size' => 50,
         ]);
 
-        if (!$response->successful()) return [];
+        if ( ! $response->successful() ) return [];
 
         return collect($response->json()['response']['results'])->map(function ($item) {
             return [
@@ -33,6 +33,7 @@ class GuardianService implements NewsSourceInterface
                 'image_url'    => $item['fields']['thumbnail'] ?? null,
                 'published_at' => $item['webPublicationDate'] ?? null,
             ];
+            
         })->toArray();
     }
 }

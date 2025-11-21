@@ -14,31 +14,20 @@ class ArticleController extends Controller
     {
         $query = Article::with(['source', 'category']);
 
-        // Filtering
-        $query->when($request->source_id, fn($q) => $q->where('source_id', $request->source_id));
-        $query->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id));
-        $query->when($request->author, fn($q) => $q->where('author', 'like', "%{$request->author}%"));
-        $query->when($request->date_from, fn($q) => $q->whereDate('published_at', '>=', $request->date_from));
-        $query->when($request->date_to, fn($q) => $q->whereDate('published_at', '<=', $request->date_to));
+        $this->applyFilters($query, $request);
 
-        // Full-text search (title & description)
-        if ($request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Sorting
+        // Sorting (optional: allow user to change it later)
         $query->orderBy('published_at', 'desc');
 
         // Pagination
-        $perPage = $request->get('per_page', 20);
+        $perPage = $request->integer('per_page', 20);
 
         return $query->paginate($perPage);
     }
 
+    /**
+     * Store an article
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -53,14 +42,20 @@ class ArticleController extends Controller
             'published_at' => 'nullable|date',
         ]);
 
-        return Article::create($data);
+        return Article::create($data)->load(['source', 'category']);
     }
 
+    /**
+     * Show an article
+     */
     public function show(Article $article)
     {
         return $article->load(['source', 'category']);
     }
 
+    /**
+     * Update an article
+     */
     public function update(Request $request, Article $article)
     {
         $data = $request->validate([
@@ -77,13 +72,52 @@ class ArticleController extends Controller
 
         $article->update($data);
 
-        return $article;
+        return $article->load(['source', 'category']);
     }
 
+    /**
+     * Destroy an article
+     */
     public function destroy(Article $article)
     {
         $article->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * Apply all filters to the query builder
+     */
+    protected function applyFilters($query, Request $request)
+    {
+        $query->when($request->source_id, fn($q) =>
+            $q->where('source_id', $request->source_id)
+        );
+
+        $query->when($request->category_id, fn($q) =>
+            $q->where('category_id', $request->category_id)
+        );
+
+        $query->when($request->author, fn($q) =>
+            $q->where('author', 'like', "%{$request->author}%")
+        );
+
+        $query->when($request->date_from, fn($q) =>
+            $q->whereDate('published_at', '>=', $request->date_from)
+        );
+
+        $query->when($request->date_to, fn($q) =>
+            $q->whereDate('published_at', '<=', $request->date_to)
+        );
+
+        // Full-text search
+        if ($request->search) {
+            $search = $request->search;
+
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
     }
 }

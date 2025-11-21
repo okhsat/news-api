@@ -88,6 +88,23 @@ sqlite3 database/database.sqlite
 sqlite> .tables
 sqlite> .schema sources
 sqlite> select * from sources;
+php artisan config:clear
+php artisan make:command TestNewsSources
+php artisan news:test
+sqlite3 database/database.sqlite
+sqlite> SELECT COUNT(*) FROM articles;
+sqlite> SELECT id, title, source_id FROM articles ORDER BY id DESC LIMIT 10;
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate
+php artisan migrate:fresh
+php artisan test
+php artisan queue:work --daemon --sleep=3 --tries=3
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan schedule:run
+* * * * * cd /var/www/turan/news/api && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ## License

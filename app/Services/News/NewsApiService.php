@@ -21,9 +21,7 @@ class NewsApiService implements NewsSourceInterface
             'pageSize' => 50,
         ]);
 
-        if (!$response->successful()) {
-            return [];
-        }
+        if ( ! $response->successful() ) return [];
 
         // Normalize articles
         return collect($response->json()['articles'])->map(function ($item) {
@@ -36,6 +34,7 @@ class NewsApiService implements NewsSourceInterface
                 'image_url'    => $item['urlToImage'] ?? null,
                 'published_at' => $item['publishedAt'] ?? null,
             ];
+            
         })->toArray();
     }
 }
