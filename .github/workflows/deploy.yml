@@ -13,14 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.8
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.9
         with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-
-      - name: Deploy to server
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ vars.USER }}@${{ vars.HOST }} "
+          host: ${{ vars.HOST }}
+          username: ${{ vars.USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
             mkdir -p /var/www/turan/news/api
             cd /var/www/turan/news/api
 
@@ -68,5 +67,4 @@ jobs:
             chmod -R 775 storage bootstrap/cache
 
             # Restart PHP-FPM
-            sudo systemctl restart php8.2-fpm
-          "
+            sudo systemctl restart php8.4-fpm
