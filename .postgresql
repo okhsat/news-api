@@ -1,0 +1,10 @@
+> sudo systemctl status postgresql
+> sudo -i -u postgres
+> sudo -i -u postgres psql
+
+>> DROP DATABASE IF EXISTS news;
+>> CREATE DATABASE news;
+>> DROP USER IF EXISTS news;
+>> CREATE USER news WITH ENCRYPTED PASSWORD 'xxxxx';
+>> GRANT ALL PRIVILEGES ON DATABASE news TO news;
+>> \q

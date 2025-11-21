@@ -100,7 +100,8 @@ sqlite> SELECT COUNT(*) FROM articles;
 sqlite> SELECT id, title, source_id FROM articles ORDER BY id DESC LIMIT 10;
 php artisan migrate:fresh
 php artisan test
-php artisan queue:work --daemon --sleep=3 --tries=3
+php artisan queue:work --sleep=3 --tries=3
+php artisan queue:work redis --sleep=3 --tries=3
 php artisan cache:clear
 php artisan config:clear
 php artisan route:clear

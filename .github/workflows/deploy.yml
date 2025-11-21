@@ -1,0 +1,72 @@
+name: Deploy News Aggregator API
+concurrency: production
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ vars.USER }}@${{ vars.HOST }} "
+            mkdir -p /var/www/turan/news/api
+            cd /var/www/turan/news/api
+
+            # Pull latest code
+            git fetch --all
+            git reset --hard origin/master
+            git clean -fd
+
+            # Always overwrite .env from .env.example
+            cp .env.example .env
+
+            # Database
+            sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env
+            sed -i 's/DB_HOST=.*/DB_HOST=${{ vars.DB_HOST }}/' .env
+            sed -i 's/DB_PORT=.*/DB_PORT=${{ vars.DB_PORT }}/' .env
+            sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' .env
+            sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' .env
+            sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' .env
+
+            # Redis
+            sed -i 's/REDIS_HOST=.*/REDIS_HOST=${{ vars.REDIS_HOST }}/' .env
+            sed -i 's/REDIS_PORT=.*/REDIS_PORT=${{ vars.REDIS_PORT }}/' .env
+            sed -i 's/REDIS_PASSWORD=.*/REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}/' .env
+
+            # Queue & Cache
+            sed -i 's/#QUEUE_CONNECTION=.*/QUEUE_CONNECTION=redis/' .env
+            sed -i 's/#CACHE_STORE=.*/CACHE_STORE=redis/' .env
+
+            # News API keys
+            sed -i 's|#NEWSAPI_KEY=.*|NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}|' .env
+            sed -i 's|#GUARDIAN_KEY=.*|GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}|' .env
+
+            # Generate APP_KEY
+            php artisan key:generate --force
+
+            # Install dependencies and optimize
+            composer install --no-interaction --prefer-dist --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # Fix permissions
+            chown -R www-data:www-data storage bootstrap/cache
+            chmod -R 775 storage bootstrap/cache
+
+            # Restart PHP-FPM
+            sudo systemctl restart php8.2-fpm
+          "

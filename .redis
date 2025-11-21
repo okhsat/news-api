@@ -1,0 +1,6 @@
+> sudo systemctl status redis-server
+> redis-cli
+
+>> ping
+>> auth xxxxxxx
+>> keys *

@@ -1,0 +1,5 @@
+> ssh-keygen -t ed25519 -C "github-news@news" -f ~/.ssh/github_news -N ""
+> cat ~/.ssh/github_news.pub >> ~/.ssh/authorized_keys
+> chmod 600 ~/.ssh/authorized_keys
+> cat ~/.ssh/github_news
+> ssh -i ~/.ssh/github_news github@207.154.231.171
