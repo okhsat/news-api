@@ -35,40 +35,31 @@ jobs:
               git clean -fd
             fi
 
-            # Create .env from .env.example if it does not exist
-            if [ ! -f ".env" ]; then
-              cp .env.example .env
-            fi
+            # Create .env
+            cat > .env <<EOL
+APP_NAME=News Aggregator API
+APP_ENV=production
+APP_KEY=${{ secrets.APP_KEY }}
+APP_DEBUG=false
+APP_URL=https://api.news.turandevelop.com
 
-            # Escape special characters
-            ESCAPED_DB_PASSWORD=$(printf '%s' "${{ secrets.DB_PASSWORD }}" | sed -e 's/[\/&$!]/\\&/g')
-            ESCAPED_REDIS_PASSWORD=$(printf '%s' "${{ secrets.REDIS_PASSWORD }}" | sed -e 's/[\/&$!]/\\&/g')
+DB_CONNECTION=pgsql
+DB_HOST=${{ vars.DB_HOST }}
+DB_PORT=${{ vars.DB_PORT }}
+DB_DATABASE=${{ secrets.DB_DATABASE }}
+DB_USERNAME=${{ secrets.DB_USERNAME }}
+DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
 
-            # Database
-            sed -i "s/^#\?DB_CONNECTION=.*/DB_CONNECTION=pgsql/" .env
-            sed -i "s/^#\?DB_HOST=.*/DB_HOST=${{ vars.DB_HOST }}/" .env
-            sed -i "s/^#\?DB_PORT=.*/DB_PORT=${{ vars.DB_PORT }}/" .env
-            sed -i "s/^#\?DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/" .env
-            sed -i "s/^#\?DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/" .env
-            sed -i "s/^#\?DB_PASSWORD=.*/DB_PASSWORD=$ESCAPED_DB_PASSWORD/" .env
+REDIS_HOST=${{ vars.REDIS_HOST }}
+REDIS_PORT=${{ vars.REDIS_PORT }}
+REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
 
-            # Redis
-            sed -i "s/^#\?REDIS_HOST=.*/REDIS_HOST=${{ vars.REDIS_HOST }}/" .env
-            sed -i "s/^#\?REDIS_PORT=.*/REDIS_PORT=${{ vars.REDIS_PORT }}/" .env
-            sed -i "s/^#\?REDIS_PASSWORD=.*/REDIS_PASSWORD=$ESCAPED_REDIS_PASSWORD/" .env
+QUEUE_CONNECTION=redis
+CACHE_STORE=redis
 
-            # Queue & Cache
-            sed -i "s/^#\?QUEUE_CONNECTION=.*/QUEUE_CONNECTION=redis/" .env
-            sed -i "s/^#\?CACHE_STORE=.*/CACHE_STORE=redis/" .env
-
-            # News APIs
-            sed -i "s|^#\?NEWSAPI_KEY=.*|NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}|" .env
-            sed -i "s|^#\?GUARDIAN_KEY=.*|GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}|" .env
-            
-            # Use APP_KEY if exists, generate otherwise
-            if ! grep -q 'APP_KEY=' .env || [ -z "$(grep APP_KEY .env | cut -d '=' -f2)" ] || ! php artisan key:validate >/dev/null 2>&1; then
-              php artisan key:generate --force
-            fi
+NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}
+GUARDIAN_KEY=${{ secrets.GUARDIAN_KEY }}
+EOL
 
             # Install dependencies and optimize
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
