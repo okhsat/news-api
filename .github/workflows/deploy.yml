@@ -89,5 +89,8 @@ jobs:
             php artisan view:cache
 
             # Build front-end assets
+            source ~/.nvm/nvm.sh 
+            source ~/.profile
+            nvm use 22 || nvm install 22
             npm install
             npm run build
