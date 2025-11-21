@@ -1,0 +1,6 @@
+> sudo visudo
+> sudo visudo -f /etc/sudoers.d/github
+
+>> github ALL=(ALL) NOPASSWD: /bin/systemctl restart php8.4-fpm
+
+> sudo chmod 440 /etc/sudoers.d/github
