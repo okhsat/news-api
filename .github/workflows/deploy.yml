@@ -81,8 +81,8 @@ jobs:
             mkdir -p storage bootstrap/cache
 
             # Fix permissions
-            chown -R www-data:www-data storage bootstrap/cache
-            chmod -R 775 storage bootstrap/cache
+            sudo chown -R www-data:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
 
             # Restart PHP-FPM
             sudo systemctl restart php8.4-fpm
