@@ -41,4 +41,5 @@ ____________________________________________
 > sudo ln -s /etc/nginx/sites-available/news /etc/nginx/sites-enabled/news
 > sudo systemctl reload nginx
 > sudo certbot --nginx -d api.news.turandevelop.com
+> sudo systemctl list-timers | grep certbot
 > sudo certbot renew --dry-run
