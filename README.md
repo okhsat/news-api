@@ -88,14 +88,12 @@ sudo apt install sqlite3
 php artisan tinker
 touch database/seeders/SourcesTableSeeder.php
 php artisan db:seed
-sqlite3 database/database.sqlite
-sqlite> .tables
-sqlite> .schema sources
-sqlite> select * from sources;
-php artisan config:clear
 php artisan make:command TestNewsSources
 php artisan news:test
 sqlite3 database/database.sqlite
+sqlite> .tables
+sqlite> .schema sources
+sqlite> SELECT * FROM sources;
 sqlite> SELECT COUNT(*) FROM articles;
 sqlite> SELECT id, title, source_id FROM articles ORDER BY id DESC LIMIT 10;
 php artisan migrate:fresh

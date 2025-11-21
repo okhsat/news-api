@@ -11,3 +11,7 @@
 >> \q
 
 > psql -h 127.0.0.1 -U news -d news
+
+>> SELECT * FROM sources;
+>> SELECT COUNT(*) FROM articles;
+>> SELECT id, title, source_id FROM articles ORDER BY id DESC LIMIT 10;
