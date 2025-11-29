@@ -18,23 +18,31 @@ class FetchArticlesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected NewsSourceInterface $service;
-    protected Source $source;
+    protected int $sourceId;
 
-    public function __construct(Source $source, NewsSourceInterface $service)
+    public function __construct(int $sourceId)
     {
-        $this->source = $source;
-        $this->service = $service;
+        $this->sourceId = $sourceId;
     }
 
     public function handle(): void
     {
-        $articles = $this->service->fetchArticles();
+        $source = Source::find($this->sourceId);
+        $service = match ($source->code) {
+          'newsapi' => app(\App\Services\News\NewsApiService::class),
+          'guardian' => app(\App\Services\News\GuardianService::class),
+          'bbc'      => app(\App\Services\News\BbcService::class),
+          default    => null,
+        };
+
+        if ( ! $service ) return;
+
+        $articles = $service->fetchArticles();
         $fetchedCount = 0;
         $categoriesMap = Category::pluck('id', 'slug')->toArray();
 
         foreach ($articles as $data) {
-            $data['source_id'] = $this->source->id;
+            $data['source_id'] = $source->id;
             $slug = Str::slug($data['category'] ?? 'General');
             $data['category_id'] = $categoriesMap[$slug] ?? $categoriesMap['general'];
 
@@ -51,7 +59,7 @@ class FetchArticlesJob implements ShouldQueue
 
         // Log the sync
         SyncLog::create([
-            'source_id' => $this->source->id,
+            'source_id' => $source->id,
             'synced_at' => now(),
             'fetched_count' => $fetchedCount,
             'status' => 'success',

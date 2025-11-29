@@ -27,28 +27,9 @@ class TestNewsSources extends Command
 
         foreach ($sources as $source) {
             $this->line("➡ Testing source: {$source->name} ({$source->code})");
-
-            // Determine which service to use
-            switch ($source->code) {
-                case 'newsapi':
-                    $service = new NewsApiService();
-                    break;
-
-                case 'guardian':
-                    $service = new GuardianService();
-                    break;
-
-                case 'bbc':
-                    $service = new BbcService();
-                    break;
-
-                default:
-                    $this->error("❌ Unknown source type: {$source->code}");
-                    continue 2;
-            }
-
+            
             try {
-                FetchArticlesJob::dispatchSync($source, $service);
+                FetchArticlesJob::dispatchSync($source->id);
                 $this->info("✅ Success fetching from: {$source->name}\n");
 
             } catch (\Exception $e) {

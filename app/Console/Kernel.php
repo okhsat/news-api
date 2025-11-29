@@ -24,21 +24,7 @@ class Kernel extends ConsoleKernel
             if ( $sources->isEmpty() ) return;
 
             foreach ($sources as $source) {
-                switch ($source->code) {
-                    case 'newsapi':
-                        $service = new \App\Services\News\NewsApiService();
-                        break;
-                    case 'guardian':
-                        $service = new \App\Services\News\GuardianService();
-                        break;
-                    case 'bbc':
-                        $service = new \App\Services\News\BbcService();
-                        break;
-                    default:
-                        continue 2;
-                }
-
-                FetchArticlesJob::dispatch($source, $service);
+                FetchArticlesJob::dispatch($source->id);
             }
 
         })->everyFifteenMinutes();
